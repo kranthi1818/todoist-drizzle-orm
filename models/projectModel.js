@@ -1,5 +1,6 @@
 import db from '../config/db.js'
 import { projects } from '../config/schema.js';
+import { eq } from 'drizzle-orm'
 
 export async function projectCreation(name, color, is_favorite) {
     const result = await db.insert(projects).values({
@@ -26,10 +27,12 @@ export async function projectCreation(name, color, is_favorite) {
   
   export async function projectById(id) {
     try {
-      const result = await db.select().from(projects).where(projects.id.equals(id));
+      const result = await db.select().from(projects).where(eq(projects.id, id));
+  
       if (result.length === 0) {
         throw new Error(`Project with id ${id} not found`);
       }
+  
       return result[0];
     } catch (error) {
       throw new Error('Unable to get the project: ' + error.message);
@@ -38,10 +41,12 @@ export async function projectCreation(name, color, is_favorite) {
 
   export async function projectDeleting(id) {
     try {
-      const result = await db.delete().from(projects).where(projects.id.equals(id));
-      if (result.count === 0) {
+      const result = await db.delete(projects).where(eq(projects.id, id));
+  
+      if (result.rowsAffected === 0) {
         throw new Error(`Project with id ${id} not found`);
       }
+  
       return { message: `Project with id ${id} Deleted Successfully` };
     } catch (error) {
       throw new Error('Unable to delete the project: ' + error.message);
@@ -50,7 +55,7 @@ export async function projectCreation(name, color, is_favorite) {
 
   export async function allProjectsDelete() {
     try {
-      const result = await db.delete().from(projects);
+      const result = await db.delete(projects);
       return { message: 'All Projects Deleted Successfully' };
     } catch (error) {
       throw new Error('Deleting Projects Failed: ' + error.message);

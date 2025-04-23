@@ -1,7 +1,7 @@
 
-
 import db from '../config/db.js';
 import { tasks } from '../config/schema.js';
+import { eq } from 'drizzle-orm';
 
 export async function taskCreation(project_id, content, description, due_date) {
   try {
@@ -29,11 +29,25 @@ export async function getTasksAll() {
   }
 }
 
+export async function getTaskById(id) {
+  try {
+    const result = await db.select().from(tasks).where(eq(tasks.id, id));
+
+    if (result.length === 0) {
+      throw new Error(`Task with id ${id} not found`);
+    }
+
+    return result[0];
+  } catch (error) {
+    throw new Error('Unable to get the task: ' + error.message);
+  }
+}
+
 export async function updateTaskStatus(id, is_completed, content, description) {
   try {
     const result = await db.update(tasks)
       .set({ is_completed, content, description })
-      .where(tasks.id.equals(id));
+      .where(eq(tasks.id, id));
 
     if (result.count === 0) {
       throw new Error(`Task with id ${id} not found`);
@@ -47,9 +61,9 @@ export async function updateTaskStatus(id, is_completed, content, description) {
 
 export async function deleteTaskById(id) {
   try {
-    const result = await db.delete().from(tasks).where(tasks.id.equals(id));
+    const result = await db.delete(tasks).where(eq(tasks.id, id));
 
-    if (result.count === 0) {
+    if (result.rowsAffected === 0) {
       throw new Error(`Task with id ${id} not found`);
     }
 
@@ -58,3 +72,4 @@ export async function deleteTaskById(id) {
     throw new Error('Failed to delete task: ' + error.message);
   }
 }
+

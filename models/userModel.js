@@ -1,55 +1,61 @@
 
-import db from '../config/db.js'
+import db from '../config/db.js';
 import { users } from '../config/schema.js';
-
+import { eq } from 'drizzle-orm';
 
 export async function createUserInDB(name, email) {
-    console.log("name: ", name);
-    console.log("email: ", email);
-    try {
-        
-      const inserted = await db.insert(users).values({ name, email});
-  
-      return inserted[0]
-    } catch (err) {
-        console.log("kkkkk");
-        
-      throw new Error('Error creating users: ' + err.message);
-    }
-  }
+  try {
+    const result = await db.insert(users).values({ name, email });
+    const id = result[0]?.id;
 
+    return { id, name, email };
+  } catch (err) {
+    throw new Error('Error creating user: ' + err.message);
+  }
+}
 
 export async function getAllUsersFromDB() {
-    try {
-      const allUsers = await db.select().from(users);
-      return allUsers;
-    } catch (err) {
-      throw new Error("Failed to fetch users: " + err.message);
-    }
+  try {
+    const result = await db.select().from(users);
+    return result;
+  } catch (err) {
+    throw new Error('Failed to fetch users: ' + err.message);
   }
+}
 
-  export async function getUserByIdFromDB(id) {
-    const user = await db.select().from(users).where(eq(users.id, Number(id)));
-  
-    if (user.length === 0) {
+export async function getUserByIdFromDB(id) {
+  try {
+    const result = await db.select().from(users).where(eq(users.id, Number(id)));
+
+    if (result.length === 0) {
       throw new Error(`User with id ${id} not found`);
     }
-  
-    return user[0];
-  }
 
-  export async function deleteUserByIdFromDB(id) {
+    return result[0];
+  } catch (err) {
+    throw new Error('Unable to fetch user: ' + err.message);
+  }
+}
+
+export async function deleteUserByIdFromDB(id) {
+  try {
     const result = await db.delete(users).where(eq(users.id, Number(id)));
-  
+
     if (result.rowsAffected === 0) {
       throw new Error(`User with id ${id} not found`);
     }
-  
-    return { message: `User with id ${id} is deleted` };
+
+    return { message: `User with id ${id} deleted successfully` };
+  } catch (err) {
+    throw new Error('Unable to delete user: ' + err.message);
   }
+}
 
-
-  export async function deleteAllUsersFromDB() {
+export async function deleteAllUsersFromDB() {
+  try {
     await db.delete(users);
-    return { message: "All users deleted successfully" };
+    return { message: 'All users deleted successfully' };
+  } catch (err) {
+    throw new Error('Deleting users failed: ' + err.message);
   }
+}

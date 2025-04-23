@@ -8,19 +8,20 @@ import {
 
 export async function createProject(req, res) {
   try {
-    const { name, color, is_favorite } = req.body
+    const { name, color, is_favourite } = req.body
 
     if (!name) {
       return res.status(400).json({ error: "Project name is required" })
     }
 
-    let project = await projectCreation(name, color, is_favorite)
+    let project = await projectCreation(name, color, is_favourite)
 
     res.status(201).json(project)
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
 }
+
 
 export async function getAllProjects(req, res) {
   try {

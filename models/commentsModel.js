@@ -1,5 +1,7 @@
 import db from '../config/db.js';
 import { comments } from '../config/schema.js';
+import { eq } from 'drizzle-orm';
+
 
 export async function createCommentInDB(user_id, task_id, project_id, content) {
   try {
@@ -30,7 +32,7 @@ export async function getAllCommentsFromDB() {
 
 export async function getCommentsByIdFromDB(id) {
   try {
-    const result = await db.select().from(comments).where(comments.id.equals(id));
+    const result = await db.select().from(comments).where(eq(comments.id, id));
     if (result.length === 0) {
       throw new Error(`Comment with id ${id} not found`);
     }
@@ -42,15 +44,18 @@ export async function getCommentsByIdFromDB(id) {
 
 export async function deleteCommentByIdFromDB(id) {
   try {
-    const result = await db.delete().from(comments).where(comments.id.equals(id));
+    const result = await db.delete(comments).where(eq(comments.id, id));
+    
     if (result.count === 0) {
       throw new Error(`Comment with id ${id} not found`);
     }
+    
     return { message: `Comment with id ${id} deleted successfully` };
   } catch (error) {
     throw new Error('Unable to delete the comment: ' + error.message);
   }
 }
+
 
 export async function deleteAllCommentsFromDB() {
   try {
@@ -60,10 +65,12 @@ export async function deleteAllCommentsFromDB() {
     throw new Error('Unable to delete all comments: ' + error.message);
   }
 }
-
 export async function updateCommentInDB(id, content) {
   try {
-    const result = await db.update(comments).set({ content }).where(comments.id.equals(id));
+    const result = await db.update(comments)
+      .set({ content })
+      .where(eq(comments.id, id));
+    
     if (result.count === 0) {
       throw new Error(`Comment with id ${id} not found`);
     }
@@ -75,7 +82,7 @@ export async function updateCommentInDB(id, content) {
 
 export async function getAllCommentsFromUserDB(userId) {
   try {
-    const result = await db.select().from(comments).where(comments.user_id.equals(userId));
+    const result = await db.select().from(comments).where(eq(comments.user_id, userId));
     return result;
   } catch (error) {
     throw new Error('Unable to get comments for user: ' + error.message);
@@ -84,9 +91,12 @@ export async function getAllCommentsFromUserDB(userId) {
 
 export async function getAllCommentsPerTaskDB(projectId, taskId) {
   try {
-    const result = await db.select().from(comments).where(comments.project_id.equals(projectId)).andWhere(comments.task_id.equals(taskId));
+    const result = await db.select().from(comments)
+      .where(eq(comments.project_id, projectId))
+      .where(eq(comments.task_id, taskId));
     return result;
   } catch (error) {
     throw new Error('Unable to get comments for task: ' + error.message);
   }
 }
+

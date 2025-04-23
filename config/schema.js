@@ -12,7 +12,7 @@ export const projects = sqliteTable("projects", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull().unique(),
   color: text("color"),
-  is_favourite: integer("is_favourite").notNull().default(0),
+  is_favourite: integer('is_favorite').notNull().default(0),
   created_at: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`)
 })
 
