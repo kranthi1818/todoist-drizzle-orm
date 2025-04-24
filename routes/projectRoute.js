@@ -1,6 +1,4 @@
 
-
-
 import express from 'express'
 import {createProject, getAllProjects,deleteProject,deleteAllProjects,getProjectById} from '../controllers/projectController.js'
 

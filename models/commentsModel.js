@@ -75,7 +75,7 @@ export async function allCommentsPerProject(id) {
 export async function deleteCommentByIdFromDB(id) {
   try {
 
-    const result =  await db.delete(comments).where(eq(comments.id, id))
+      await db.delete(comments).where(eq(comments.id, id))
 
     return { message: `Comment with ID ${id} deleted successfully`};
 
@@ -88,7 +88,7 @@ export async function deleteCommentByIdFromDB(id) {
 export async function deleteAllCommentsFromDB() {
   try {
 
-     await db.delete().from(comments)
+    await db.delete().from(comments)
 
     return { mesaage:'All Comments Deleted Successfully' }
 

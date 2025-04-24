@@ -70,7 +70,7 @@ export async function updateTask(req, res) {
 
   } catch (error) {
 
-    res.status(400).json({ message: error.message })
+    res.status(500).json({ message: error.message })
   }
 
 }
@@ -93,6 +93,6 @@ export async function deleteTask(req, res) {
 
   } catch (error) {
 
-    res.status(404).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 }

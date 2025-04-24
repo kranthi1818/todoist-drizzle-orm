@@ -57,7 +57,7 @@ export async function updateTaskStatus(id,content,description,project_id) {
 
 export async function deleteTaskById(id) {
   try {
-    const result = await db.delete(tasks).where(eq(tasks.id, id)).returning()
+     await db.delete(tasks).where(eq(tasks.id, id)).returning()
 
     return { message: 'Task deleted successfully'}
 
