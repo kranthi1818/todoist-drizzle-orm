@@ -3,20 +3,30 @@ import { taskCreation,getTasksAll,updateTaskStatus,deleteTaskById} from "../mode
 
 export async function createTask(req, res) {
   try {
-    const { project_id, content, description, due_date } = req.body
+    const { project_id, content, description, due_date ,is_completed} = req.body
 
-    if (!project_id || !content || !description || !due_date) {
+    if (!project_id) {
       return res
         .status(400)
-        .json({ error: "Project ID and Content are required" })
+        .json({ error: "Project-ID is required mandatory" })
+    }
+    if(!description){
+      return res
+        .status(400)
+        .json({ error: "description required" })
     }
 
-    const task = await taskCreation(project_id, content, description, due_date)
+    if ( !content || content.trim().length === 0) {
+      return res.status(400).json({ error: "task cannot be empty and" });
+    }
+
+    const task = await taskCreation(project_id, content, description, due_date,is_completed)
 
     res.status(201).json(task)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
+  
 }
 
 export async function getAllTasks(req, res) {
@@ -32,24 +42,57 @@ export async function getAllTasks(req, res) {
 export async function updateTask(req, res) {
   try {
     const { id } = req.params
-    const { is_completed ,description,content} = req.body
+    const { description,content,project_id} = req.body
 
-    const result = await updateTaskStatus(id, is_completed,content,description)
+    if (!id) {
+      return res.status(400).json({ msg: "task ID  is mandatory" });
+    }
+    
+    if (isNaN(id)) {
+      return res.status(400).json({ msg: "task ID should be a number" });
+    }
+    
+    if (!project_id) {
+      return res.status(400).json({ msg: "project ID for task  mandatory" });
+    }
+
+    if (isNaN(project_id)) {
+      return res.status(400).json({ msg: "project id should be a number" });
+    }
+
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({ msg: "task content cannot be empty" });
+    }
+
+    const result = await updateTaskStatus(id,content,description,project_id)
 
     res.status(200).json(result)
+
   } catch (error) {
-    res.status(500).json({ message: error.message })
+
+    res.status(400).json({ message: error.message })
   }
+
 }
 
 
 export async function deleteTask(req, res) {
-  const { id } = req.params;
+  const { id } = req.params
+
+  if (!id) {
+    return res.status(400).json({ error: "task id is required" })
+  }
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: "task id must be a  number" })
+  }
 
   try {
     const result = await deleteTaskById(id);
     res.status(200).json(result);
+
   } catch (error) {
+
     res.status(404).json({ message: error.message });
   }
 }
