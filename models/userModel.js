@@ -3,9 +3,19 @@ import db from '../config/db.js';
 import { users } from '../config/schema.js';
 import { eq } from 'drizzle-orm';
 
-export async function createUserInDB(name, email) {
+export async function findUserByEmailFromDB(email) {
   try {
-    const result = await db.insert(users).values({ name, email }).returning()
+    const result = await db.select().from(users).where(eq(users.email, email))
+    return result?.[0] || null; 
+  } catch (err) {
+    throw new Error("Error finding user by email: " + err.message);
+  }
+}
+
+
+export async function createUserInDB(name, email,password) {
+  try {
+    const result = await db.insert(users).values({ name, email,password }).returning()
     
     return result
 
